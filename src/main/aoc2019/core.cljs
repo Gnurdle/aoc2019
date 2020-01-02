@@ -1,6 +1,8 @@
 (ns aoc2019.core
   (:require [cljs-node-io.core :as io]
-            [clojure.string :as cstr]))
+            [clojure.string :as cstr]
+            [clojure.set :as cset]
+            [cljs.test :as ctest]))
 
 (defn- day1-data []
   (->> "resources/day1.txt"
@@ -68,11 +70,6 @@
               (assoc 1 noun)
               (assoc 2 verb)))))
 
-(comment
-  (def mem (day2-data))
-  (noun-verb mem 12 2)
-)
-
 (defn ^:private day2b []
   (let [mem (day2-data)
         ans 19690720
@@ -82,15 +79,71 @@
     (+ (* 100 (first match)) (second match))
     ))
 
-(comment
-  (day2b)
-  )
-  
-(defn main [& args]
-  (println "day1-a: " (day1a))
-  (println "day1-b: " (day1b))
-  (println "day2-a: " (day2a))
-  (println "day2-b: " (day2b))
-  )
-(main)
+(defn ^:private parse-move
+  [ss]
+  (let [dd (keyword (first ss))
+        nn (js/parseInt (subs ss 1))]
+    [dd nn]))
 
+(defn- day3-data []
+  (let [fix-line (fn [x]
+                   (-> x
+                       (cstr/split #",")
+                       (as-> d (mapv parse-move d))))]
+    (-> "resources/day3.txt"
+        (io/slurp)
+        (cstr/split-lines)
+        (as-> x (mapv fix-line x)))))
+
+(defn ^:private points-traversed-by-move
+  "given starting point and move, return the points traversed by dragging"
+  [start move]
+  (let [[direction count] move
+        stepper (case direction
+                  :L (fn [[x y]] [(dec x) y])
+                  :R (fn [[x y]] [(inc x) y])
+                  :U (fn [[x y]] [x (inc y)])
+                  :D (fn [[x y]] [x (dec y)]))]
+    (reduce (fn [pts pt]
+              (conj pts (stepper (last pts)))) [start] (range count))))
+
+(defn ^:private points-traversed-by-path
+  "return the set of all points traversed by the moves in path"
+  [path]
+  (loop [seen #{} curr [0 0] moves path]
+    (if-not (seq moves)
+      seen 
+      (let [more-points (points-traversed-by-move curr (first moves))
+            new-curr (last more-points)]
+        (recur (cset/union seen (into #{} more-points)) new-curr (rest moves))))))
+
+(defn ^:private abs [x] 
+  (max x (- x)))
+
+(defn ^:private manhattan-dist-origin
+  [[x y]]
+  (+ (abs x) (abs y)))
+
+(defn ^:private day3a []
+  (let [[path1 path2] (day3-data)
+        crossings (disj (cset/intersection (points-traversed-by-path path1)
+                                           (points-traversed-by-path path2)) [0 0])
+        nearest-point (apply min-key manhattan-dist-origin crossings)]
+  (manhattan-dist-origin nearest-point)))
+
+
+
+(comment
+  (def $x (day3a))
+  
+  )
+
+(ctest/deftest all-tests
+  (ctest/is (= (day1a) 3382136))
+  (ctest/is (= (day1b) 5070314))
+  (ctest/is (= (day2a) 3562624))
+  (ctest/is (= (day2b) 82938))
+  (ctest/is (= (day3a) 1285)))
+
+(comment (time (all-tests))
+         )
