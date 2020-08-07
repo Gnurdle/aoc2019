@@ -1,5 +1,6 @@
 node_modules/
 public/js
+*~
 
 /target
 /checkouts
@@ -15,6 +16,7 @@ pom.xml.asc
 .lein-*
 .nrepl-*
 .DS_Store
+.calva/
 
 .hgignore
 .hg/

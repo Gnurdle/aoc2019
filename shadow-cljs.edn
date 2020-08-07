@@ -1,0 +1,15 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies
+ [[cljs-node-io "1.1.2"]]
+
+ :builds
+ {:app {:target :node-script
+        :main aoc2019.core/main
+        :output-to "target"
+        }}
+ }
