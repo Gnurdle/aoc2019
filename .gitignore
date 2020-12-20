@@ -17,6 +17,7 @@ pom.xml.asc
 .nrepl-*
 .DS_Store
 .calva/
-
+.*
 .hgignore
 .hg/
+build/

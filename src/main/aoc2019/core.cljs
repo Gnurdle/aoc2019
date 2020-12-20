@@ -4,6 +4,7 @@
             [aoc2019.day3 :as day3]))
 
 (defn main []
+  #_(cljs.repl/repl (cljs.repl.node/repl-env :port 8192))
   (let [runs
         [["day1a" day1/day1a 3382136]
          ["day1b" day1/day1b 5070314]

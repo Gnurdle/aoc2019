@@ -10,6 +10,6 @@
  :builds
  {:app {:target :node-script
         :main aoc2019.core/main
-        :output-to "target"
+        :output-to "build/aoc2019.js"
         }}
  }
