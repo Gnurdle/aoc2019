@@ -20,4 +20,5 @@ pom.xml.asc
 .*
 .hgignore
 .hg/
+.lsp/
 build/
